@@ -1,30 +1,20 @@
-package camt.cbsd.lab05.service;
+package camt.cbsd.lab05.dao;
 
-import camt.cbsd.lab05.dao.StudentDao;
 import camt.cbsd.lab05.entity.Student;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-
 @Profile("local")
 @ConfigurationProperties(prefix="server")
 
-@Service
-public class StudentServiceImpl implements StudentService {
-//    String imageBaseUrl = "http://localhost:3000/images/";
-    @Autowired
-    StudentDao studentDao;
+@Repository
 
-    public List<Student> getStudentDao() {
-        return studentDao.getStudents();
-    }
-
+public class SecondStudentDaoimpl implements StudentDao {
+    List<Student> students;
     String baseUrl;
     String imageUrl;
 
@@ -36,17 +26,16 @@ public class StudentServiceImpl implements StudentService {
         this.imageUrl = imageUrl;
     }
 
-    @PostConstruct
-    protected void setImageBaseUrl() {
-        this.imageBaseUrl = this.baseUrl + this.imageUrl;
-    }
+
+
     String imageBaseUrl;
+    @PostConstruct
+    private void init(){
+        imageBaseUrl=baseUrl+imageUrl;
+        students= new ArrayList<>();
 
-    public List<Student> getStudents(){
-        List<Student> students = new ArrayList<>();
-
-        Student student = new Student(1, "SE-001", "Mitsuha", "Miyamizu",
-                2.15, imageBaseUrl+"mitsuha.gif", true, 0,
+        Student student = new Student(1, "SE-1", "pu", "paiya",
+                2.15, imageBaseUrl+"pu.gif", true, 0,
                 "The most beloved one");
         students.add(student);
         student = new Student(2, "SE-002", "Prayuth", "The minister",
@@ -57,6 +46,16 @@ public class StudentServiceImpl implements StudentService {
                 2.15, imageBaseUrl+"Kloop.gif", true, 2,
                 "The man for the Kop");
         students.add(student);
+
+    }
+    @Override
+    public  List<Student> getStudents(){
         return students;
+    }
+
+    @Override
+    public Student findById(long id) {
+        return students.stream().filter(s ->s.getId()
+                == id).findFirst().get();
     }
 }
